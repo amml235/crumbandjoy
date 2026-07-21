@@ -31,6 +31,16 @@
   --tan-soft:#E2CFAF;
   --card:#FFFBF4;
   --shadow:0 10px 30px rgba(74,52,42,.10);
+
+  /* ─────────  ANIMATION CONTROLS — tweak everything here  ───────── */
+  --anim-reveal:.7s;      /* scroll fade-up duration                */
+  --anim-stagger:.09s;    /* gap between staggered flavor cards     */
+  --anim-bob:4s;          /* hero cookie gentle bob speed           */
+  --anim-crumb:6s;        /* crumb / choc-chip drift speed          */
+  --anim-steam:3.4s;      /* steam wisp rise speed                  */
+  --anim-glow:2.6s;       /* "Order now" button glow cycle          */
+  --anim-pulse:2s;        /* PB&J "NEW" badge pulse speed           */
+  --ease-bounce:cubic-bezier(.34,1.56,.64,1);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -51,8 +61,10 @@ nav{position:sticky;top:14px;z-index:50;display:flex;justify-content:center;padd
 .nav-links{display:flex;gap:2px}
 .nav-links a{padding:8px 14px;border-radius:999px;font-size:.92rem;font-weight:500;color:var(--cocoa-soft);transition:background .2s,color .2s}
 .nav-links a:hover{background:var(--cream-2);color:var(--cocoa)}
-.nav-cta{background:var(--cocoa);color:var(--cream);padding:9px 20px;border-radius:999px;font-weight:600;font-size:.92rem;transition:transform .15s,background .2s;white-space:nowrap}
+.nav-cta{background:var(--cocoa);color:var(--cream);padding:9px 20px;border-radius:999px;font-weight:600;font-size:.92rem;transition:transform .15s,background .2s;white-space:nowrap;animation:glow var(--anim-glow) ease-in-out infinite}
 .nav-cta:hover{background:var(--cocoa-deep);transform:translateY(-1px)}
+.nav-cta:active{transform:scale(.96)}
+@keyframes glow{0%,100%{box-shadow:0 0 0 rgba(217,130,122,0)}50%{box-shadow:0 0 18px rgba(217,130,122,.55)}}
 
 /* ---------- hero ---------- */
 .hero{padding:64px 0 30px;overflow-x:clip}
@@ -63,6 +75,7 @@ nav{position:sticky;top:14px;z-index:50;display:flex;justify-content:center;padd
 .hero p.lead{font-size:1.12rem;color:var(--cocoa-soft);max-width:44ch}
 .hero-ctas{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap}
 .btn{display:inline-flex;align-items:center;gap:10px;border-radius:999px;padding:15px 30px;font-weight:600;font-size:1rem;transition:transform .15s,box-shadow .2s,background .2s;cursor:pointer;border:0}
+.btn:active{transform:scale(.96)}
 .btn-primary{background:var(--cocoa);color:var(--cream);box-shadow:0 6px 0 rgba(74,52,42,.22)}
 .btn-primary:hover{transform:translateY(-2px);background:var(--cocoa-deep)}
 .btn-ghost{background:transparent;border:2px solid var(--tan);color:var(--cocoa)}
@@ -74,17 +87,25 @@ nav{position:sticky;top:14px;z-index:50;display:flex;justify-content:center;padd
 .hero-visual{position:relative;display:flex;justify-content:center}
 .cookie-ring{position:relative;width:min(420px,88%);aspect-ratio:1}
 .cookie-ring::before{content:"";position:absolute;inset:-26px;border:3px dotted var(--tan);border-radius:50%;animation:spin 40s linear infinite}
-.cookie-ring img{width:100%;height:100%;object-fit:cover;border-radius:50%;border:6px solid var(--card);box-shadow:var(--shadow)}
-.badge-fresh{position:absolute;top:-6px;right:-6px;background:var(--blush);color:#fff;font-family:'Lora',serif;font-weight:700;font-size:1rem;padding:14px 18px;border-radius:50%;transform:rotate(10deg);box-shadow:var(--shadow);text-align:center;line-height:1.2}
-.crumb{position:absolute;border-radius:50%;background:var(--tan);opacity:.55;animation:float 6s ease-in-out infinite}
+.cookie-ring img{width:100%;height:100%;object-fit:cover;border-radius:50%;border:6px solid var(--card);box-shadow:var(--shadow);animation:bob var(--anim-bob) ease-in-out infinite;will-change:transform}
+.badge-fresh{position:absolute;top:-6px;right:-6px;background:var(--blush);color:#fff;font-family:'Lora',serif;font-weight:700;font-size:1rem;padding:14px 18px;border-radius:50%;transform:rotate(10deg);box-shadow:var(--shadow);text-align:center;line-height:1.2;z-index:2}
+.crumb{position:absolute;border-radius:50%;background:var(--tan);opacity:.55;animation:float var(--anim-crumb) ease-in-out infinite}
+/* steam / aroma wisps rising off the cookie (CSS only) */
+.steam{position:absolute;top:-2%;left:50%;transform:translateX(-50%);display:flex;gap:18px;pointer-events:none;z-index:1}
+.steam span{width:9px;height:34px;border-radius:50%;background:linear-gradient(to top,rgba(255,255,255,0),rgba(255,255,255,.55));filter:blur(4px);opacity:0;animation:steam var(--anim-steam) ease-in-out infinite}
+.steam span:nth-child(2){animation-delay:.9s}
+.steam span:nth-child(3){animation-delay:1.7s}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes steam{0%{opacity:0;transform:translateY(6px) scaleX(1)}30%{opacity:.65}100%{opacity:0;transform:translateY(-42px) scaleX(1.7)}}
 
 /* ---------- marquee ---------- */
 .marquee-wrap{overflow:hidden;margin:46px 0 0;padding:8px 0}
 .marquee{background:var(--cocoa);color:var(--cream);overflow:hidden;padding:13px 0;transform:rotate(-1deg) scale(1.02)}
 .marquee-track{display:flex;gap:44px;white-space:nowrap;width:max-content;animation:scroll 26s linear infinite;font-family:'Lora',serif;font-size:1.05rem;letter-spacing:.16em;text-transform:uppercase}
 .marquee-track span i{color:var(--blush);font-style:normal;margin-right:44px}
+.marquee:hover .marquee-track{animation-play-state:paused}
 @keyframes scroll{to{transform:translateX(-50%)}}
 
 /* ---------- sections ---------- */
@@ -97,10 +118,18 @@ section{padding:74px 0 10px}
 /* flavors */
 .flavors{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
 .flavor.premium{border-color:var(--blush);position:relative}
-.newribbon{position:absolute;top:-13px;left:50%;transform:translateX(-50%) rotate(-2deg);background:var(--blush-deep);color:#fff;font-size:.7rem;font-weight:600;letter-spacing:.12em;padding:4px 14px;border-radius:999px;white-space:nowrap}
+.newribbon{position:absolute;top:-13px;left:50%;transform:translateX(-50%) rotate(-2deg);background:var(--blush-deep);color:#fff;font-size:.7rem;font-weight:600;letter-spacing:.12em;padding:4px 14px;border-radius:999px;white-space:nowrap;animation:badgepulse var(--anim-pulse) ease-in-out infinite}
+@keyframes badgepulse{0%,100%{transform:translateX(-50%) rotate(-2deg) scale(1)}50%{transform:translateX(-50%) rotate(-2deg) scale(1.09)}}
 .flavor{background:var(--card);border:2px solid var(--tan-soft);border-radius:24px;padding:20px 16px;text-align:center;transition:transform .25s,box-shadow .25s}
 .flavor:hover{transform:translateY(-8px) rotate(-1deg);box-shadow:var(--shadow)}
-.flavor img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:50%;border:4px solid var(--tan-soft);background:#fff}
+.flavor img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:50%;border:4px solid var(--tan-soft);background:#fff;transition:transform .25s}
+.flavor:hover img{animation:wiggle .5s ease}
+@keyframes wiggle{0%,100%{transform:rotate(0) scale(1)}30%{transform:rotate(-5deg) scale(1.06)}65%{transform:rotate(4deg) scale(1.04)}}
+/* stagger the flavor cards as they reveal */
+.flavors .flavor:nth-child(2){transition-delay:calc(var(--anim-stagger)*1)}
+.flavors .flavor:nth-child(3){transition-delay:calc(var(--anim-stagger)*2)}
+.flavors .flavor:nth-child(4){transition-delay:calc(var(--anim-stagger)*3)}
+.flavors .flavor:nth-child(5){transition-delay:calc(var(--anim-stagger)*4)}
 .flavor h3{font-size:1.28rem;margin:14px 0 4px}
 .flavor p{font-size:.86rem;color:var(--cocoa-soft);line-height:1.45;min-height:3.9em}
 .flavor .price{display:inline-block;margin-top:10px;background:var(--blush);color:#fff;font-family:'Lora',serif;font-weight:700;font-size:1.15rem;padding:3px 22px;border-radius:999px;transition:transform .2s}
@@ -112,6 +141,16 @@ section{padding:74px 0 10px}
 .menu-col h3{font-size:1.15rem;letter-spacing:.16em;text-transform:uppercase;color:var(--blush-deep);margin-bottom:18px;display:flex;align-items:center;gap:10px}
 .mi{display:flex;align-items:baseline;gap:12px;padding:9px 0}
 .mi + .mi{border-top:1.5px dotted var(--tan-soft)}
+/* price rows slide in (staggered) once the card is revealed */
+.menu-card .mi{opacity:0;transform:translateX(-14px);transition:opacity .5s ease,transform .5s ease}
+.menu-card.in .mi{opacity:1;transform:none}
+.menu-card.in .mi:nth-child(2){transition-delay:.05s}
+.menu-card.in .mi:nth-child(3){transition-delay:.11s}
+.menu-card.in .mi:nth-child(4){transition-delay:.17s}
+.menu-card.in .mi:nth-child(5){transition-delay:.23s}
+.menu-card.in .mi:nth-child(6){transition-delay:.29s}
+.menu-card.in .mi:nth-child(7){transition-delay:.35s}
+.menu-card.in .mi:nth-child(8){transition-delay:.41s}
 .mi .n{font-weight:500}
 .mi .n small{display:block;font-family:'Lora',serif;font-style:italic;font-weight:400;color:var(--blush-deep);font-size:.85rem}
 .mi .pcs{color:var(--cocoa-soft);font-size:.85rem;font-weight:400}
@@ -130,12 +169,20 @@ section{padding:74px 0 10px}
 .step p{font-size:.92rem;color:var(--cocoa-soft)}
 .step::after{content:"➜";position:absolute;right:-19px;top:50%;transform:translateY(-50%);color:var(--tan);font-size:1.3rem}
 .step:last-child::after{display:none}
+/* steps pop in one-by-one with a soft bounce */
+.step.reveal{opacity:0;transform:none;transition:none}
+.step.reveal.in{animation:pop .6s var(--ease-bounce) both}
+.steps .step:nth-child(2).in{animation-delay:.13s}
+.steps .step:nth-child(3).in{animation-delay:.26s}
+@keyframes pop{0%{opacity:0;transform:translateY(18px) scale(.92)}60%{opacity:1;transform:translateY(-5px) scale(1.03)}100%{opacity:1;transform:none}}
 .steps-note{margin-top:22px;text-align:center;font-family:'Lora',serif;font-style:italic;color:var(--cocoa-soft)}
 
 /* gallery */
 .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.gallery a{display:block;border-radius:24px;overflow:hidden;border:2px solid var(--tan-soft);box-shadow:var(--shadow);transition:transform .25s}
+.gallery a{position:relative;display:block;border-radius:24px;overflow:hidden;border:2px solid var(--tan-soft);box-shadow:var(--shadow);transition:transform .25s}
 .gallery a:hover{transform:translateY(-6px) rotate(-.5deg)}
+.gallery a::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(74,52,42,.34),rgba(232,154,143,.14));opacity:0;transition:opacity .3s ease;pointer-events:none}
+.gallery a:hover::after{opacity:1}
 .gallery img{width:100%;aspect-ratio:1;object-fit:cover;transition:transform .4s}
 .gallery a:hover img{transform:scale(1.06)}
 .gallery-note{margin-top:18px;text-align:center;font-family:'Lora',serif;font-style:italic;color:var(--cocoa-soft)}
@@ -163,13 +210,14 @@ footer .heartline{color:var(--blush);margin:14px 0 4px}
 footer small{font-size:.8rem;opacity:.75}
 
 /* reveal on scroll */
-.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity var(--anim-reveal) ease,transform var(--anim-reveal) ease}
 .reveal.in{opacity:1;transform:none}
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
   html{scroll-behavior:auto}
-  .reveal{opacity:1;transform:none}
+  .reveal,.menu-card .mi,.step.reveal{opacity:1!important;transform:none!important}
+  .steam{display:none}
 }
 
 /* ---------- responsive ---------- */
@@ -224,11 +272,14 @@ footer small{font-size:.8rem;opacity:.75}
     </div>
     <div class="hero-visual" aria-hidden="true">
       <div class="cookie-ring">
+        <div class="steam"><span></span><span></span><span></span></div>
         <img src="assets/hero-smores.webp" alt="Freshly baked s'mores cookie pulled apart showing gooey marshmallow and melted chocolate" loading="eager">
         <div class="badge-fresh">baked<br>fresh!</div>
         <span class="crumb" style="width:14px;height:14px;left:-8%;top:22%;animation-delay:.4s"></span>
         <span class="crumb" style="width:9px;height:9px;left:-14%;top:58%;animation-delay:1.4s"></span>
         <span class="crumb" style="width:11px;height:11px;right:-10%;bottom:14%;animation-delay:.9s"></span>
+        <span class="crumb" style="width:8px;height:8px;left:16%;top:-6%;background:var(--cocoa-soft);opacity:.45;animation-delay:2s"></span>
+        <span class="crumb" style="width:12px;height:12px;right:4%;top:44%;animation-delay:.2s"></span>
       </div>
     </div>
   </div>
